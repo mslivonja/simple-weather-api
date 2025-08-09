@@ -24,6 +24,15 @@ Basic Flask app. - initial project import.
     Press CTRL+C to quit
     127.0.0.1 - - [09/Aug/2025 18:58:08] "GET / HTTP/1.1" 200 -
 
+## REST API - Swagger UI
+
+Access Swagger UI at http://localhost:5000
+
+GET request using following request
+
+    curl -X 'GET' 'http://localhost:5000/weather/Zagreb' \
+         -H 'accept: application/json'
+
 ### Deactivate virtual env
 
     (venv)$ deactivate

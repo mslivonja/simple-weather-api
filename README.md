@@ -54,10 +54,22 @@ Run docker container with app. only
 Run with docker compose
 
 Prerequisite - create .env file with following variables
+    
     cat .env
+
+    # Weather service config
     OPENWEATHER_API_KEY=<api key>
+
+    # Minio config 
     MINIO_ACCESS_KEY=<user>
     MINIO_SECRET_KEY=<secret>
+
+    # S3 storage service config
+    S3_ENDPOINT_URL=http://localhost:9000
+    AWS_ACCESS_KEY_ID=myminioadmin
+    AWS_SECRET_ACCESS_KEY=myminiosecret
+    S3_BUCKET=test
+
 
     docker-compose up -d
 

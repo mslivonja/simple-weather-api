@@ -40,7 +40,7 @@ class WeatherService:
             "visibility": data["visibility"],
             "wind_speed": data["wind"]["speed"],
             "description": data["weather"][0]["description"].capitalize(),
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.fromtimestamp(data["dt"])
         }
 
 class WeatherServiceException(Exception):

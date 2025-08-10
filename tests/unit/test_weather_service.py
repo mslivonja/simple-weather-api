@@ -65,7 +65,8 @@ def test_fetch_weather_success(mock_get, weather_service):
     assert result["humidity"] == 59
     assert result["visibility"] == 10000
     assert result["description"] == "Clear sky"
-    assert "date" in result  # Date string exists
+    assert "timestamp" in result  # Date string exists
+    assert result["timestamp"].isoformat() == "2025-08-09T23:49:58"
 
 
 @patch("weather.requests.get")

@@ -18,7 +18,7 @@ api = Api(app,  version='1.0',
 )
 
 # Setup namespace
-ns = api.namespace('weather', description='Weather operations')
+ns = api.namespace('weather/api', description='Weather operations')
 
 # Setup model
 weather = api.model('Weather', {

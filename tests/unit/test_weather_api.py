@@ -2,7 +2,7 @@ import io
 
 import pytest
 from unittest.mock import patch
-from tests.unit.test_weather_service import API_KEY
+from tests.unit.test_weather import API_KEY
 
 
 @pytest.fixture

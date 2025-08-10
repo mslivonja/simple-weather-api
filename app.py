@@ -1,13 +1,20 @@
 import csv
 import io
 import os
+import time
 
 from flask import Flask, request, Response
 from flask_restx import Api, Resource, fields
 from werkzeug.middleware.proxy_fix import ProxyFix
 from weather import WeatherService, WeatherServiceException
+from s3_storage import S3Service
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+
+S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+S3_BUCKET = os.getenv("S3_BUCKET")
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -38,7 +45,15 @@ weather = api.model('Weather', {
     'timestamp': fields.DateTime(required=True, description='Weather forecast date')
 })
 
+# Weather Service
 weather_service = WeatherService(OPENWEATHER_API_KEY)
+# S3 storage Service
+s3 = S3Service(
+        endpoint = S3_ENDPOINT_URL,
+        bucket_name= S3_BUCKET,
+        access_key= AWS_ACCESS_KEY_ID,
+        secret_key= AWS_SECRET_ACCESS_KEY
+    )
 
 @ns.route('/city/<string:city>')
 @ns.response(404, 'Weather data not found')
@@ -70,11 +85,18 @@ class WeatherByCity(Resource):
             weather_data = weather_service.fetch_weather(city, None)
 
             if "text/csv" in accept_header:
-                output = io.StringIO()
-                writer = csv.DictWriter(output, fieldnames=weather_data.keys())
+                # Generate CSV in memory
+                csv_buffer = io.StringIO()
+                writer = csv.DictWriter(csv_buffer, fieldnames=weather_data.keys())
                 writer.writeheader()
                 writer.writerow(weather_data)
-                return Response(output.getvalue(), mimetype="text/csv")
+                csv_buffer.seek(0)
+
+                # Upload to S3
+                file_name = f"weather_{city.lower().replace(' ', '_')}_{int(time.time())}.csv"
+                s3_url = s3.upload_file(csv_buffer.getvalue(), file_name)
+
+                return Response(s3_url, mimetype='text/csv')
 
             # call marshall manually only if output is JSON
             return ns.marshal(weather_data,weather)

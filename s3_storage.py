@@ -1,5 +1,6 @@
 import boto3
 import io
+from urllib.parse import urlparse, urlunparse
 
 class S3Service:
     def __init__(self, endpoint, access_key, secret_key, bucket_name, region_name = 'us-east-1'):
@@ -31,5 +32,8 @@ class S3Service:
             Params={"Bucket": self.bucket_name, "Key": file_name},
             ExpiresIn=3600  # seconds
         )
-        return url
+
+        parsed = urlparse(url)
+        new_netloc = parsed.netloc.replace("minio", "localhost")
+        return urlunparse(parsed._replace(netloc=new_netloc))
 

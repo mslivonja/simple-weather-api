@@ -26,7 +26,7 @@ Basic Flask app. - initial project import.
 
 ## REST API - Swagger UI
 
-Access Swagger UI at http://localhost:5000
+Access Swagger UI at http://localhost:5000/api/docs
 
 GET request using following request
 

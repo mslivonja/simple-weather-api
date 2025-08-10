@@ -34,6 +34,8 @@ Package application using docker
 
 ### Run in docker container
 
+Run docker container with app. only
+
     export OPENWEATHER_API_KEY=<api key>
     docker run -d \
         --name simple-weather-api \
@@ -48,6 +50,15 @@ Package application using docker
     WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
     * Running on http://127.0.0.1:5000
     Press CTRL+C to quit
+
+Run with docker compose
+
+    export OPENWEATHER_API_KEY=<api key>
+    docker-compose up -d
+
+    docker logs -f simple-weather-api
+
+    docker-compose down
 
 ## REST API - Swagger UI
 

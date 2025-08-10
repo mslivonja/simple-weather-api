@@ -1,6 +1,8 @@
+import csv
+import io
 import os
 
-from flask import Flask
+from flask import Flask, request, Response
 from flask_restx import Api, Resource, fields
 from werkzeug.middleware.proxy_fix import ProxyFix
 from weather import WeatherService, WeatherServiceException
@@ -38,18 +40,44 @@ weather = api.model('Weather', {
 
 weather_service = WeatherService(OPENWEATHER_API_KEY)
 
-@ns.route('/<string:city>')
+@ns.route('/city/<string:city>')
 @ns.response(404, 'Weather data not found')
-@ns.param('city', 'City name')
 class WeatherByCity(Resource):
     """Get weather forecast info for given city"""
 
-    @ns.doc('Get weather forecast data for given city name')
-    @ns.marshal_with(weather)
+    @ns.doc(
+        params={
+            "city": 'City name'
+        },
+        responses={
+            200: "Weather report in JSON or CSV",
+            404: "City not found",
+            500: "Weather service unavailable"
+        }
+    )
+    @ns.produces(['application/json', 'text/csv'])
     def get(self, city: str):
-        """ Get weather info for given city, fetch data from OpenWeatherMap"""
+        """
+               Get live weather data for given city
+               Fetch  data from OpenWeatherMap API
+
+               **Content negotiation**:
+               - `Accept: application/json` → JSON output
+               - `Accept: text/csv` → CSV output
+               """
         try:
-            return weather_service.fetch_weather(city, None)
+            accept_header = request.headers.get("Accept", "application/json").lower()
+            weather_data = weather_service.fetch_weather(city, None)
+
+            if "text/csv" in accept_header:
+                output = io.StringIO()
+                writer = csv.DictWriter(output, fieldnames=weather_data.keys())
+                writer.writeheader()
+                writer.writerow(weather_data)
+                return Response(output.getvalue(), mimetype="text/csv")
+
+            # call marshall manually only if output is JSON
+            return ns.marshal(weather_data,weather)
         except WeatherServiceException as e:
             # catch weather service exception
             if e.status_code == 404:

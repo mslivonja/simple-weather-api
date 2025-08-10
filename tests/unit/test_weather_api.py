@@ -32,9 +32,17 @@ fake_weather_data = {
 def test_get_weather_json(mock_fetch, client):
     mock_fetch.return_value = fake_weather_data
 
-    response = client.get('/weather/Zagreb', headers={"Accept": "application/json"})
+    response = client.get('/weather/api/city/Zagreb', headers={"Accept": "application/json"})
     assert response.status_code == 200
     assert response.is_json
     json_data = response.get_json()
     assert json_data == fake_weather_data
     assert json_data["location"] == "Donji grad"
+
+@patch('app.WeatherService.fetch_weather')
+def test_get_weather_csv(mock_fetch, client):
+    mock_fetch.return_value = fake_weather_data
+    response = client.get('/weather/api/city/Zagreb', headers={"Accept": "text/csv"})
+    assert response.status_code == 200
+    lines = response.data.decode('utf-8').split('\r\n')
+    assert lines[1].split(',')[0] == 'Zagreb'

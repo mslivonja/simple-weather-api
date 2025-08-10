@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import requests
 
+# noinspection HttpUrlsUsage
 OPENWEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
 class WeatherService:
@@ -15,7 +16,7 @@ class WeatherService:
 
         self.units = units
 
-    def fetch_weather(self, city: str, country_code: str):
+    def fetch_weather(self, city: str, country_code: str | None):
         """Fetch live weather data from OpenWeatherMap API."""
         url = (
             f"{ OPENWEATHER_URL }"
@@ -40,7 +41,7 @@ class WeatherService:
             "visibility": data["visibility"],
             "wind_speed": data["wind"]["speed"],
             "description": data["weather"][0]["description"].capitalize(),
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.fromtimestamp(data["dt"])
         }
 
 class WeatherServiceException(Exception):

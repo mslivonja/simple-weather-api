@@ -10,9 +10,10 @@ services:
     restart: always
     environment:
       - OPENWEATHER_API_KEY
-      - MINIO_ENDPOINT=http://minio:9000
-      - MINIO_ACCESS_KEY
-      - MINIO_SECRET_KEY
+      - S3_ENDPOINT_URL
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - S3_BUCKET
 
   minio:
     image: minio/minio:latest

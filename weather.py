@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import requests
 
+# noinspection HttpUrlsUsage
 OPENWEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
 class WeatherService:

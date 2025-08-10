@@ -70,6 +70,15 @@ Prerequisite - create .env file with following variables
     AWS_SECRET_ACCESS_KEY=myminiosecret
     S3_BUCKET=test
 
+    # DB config
+    DB_USER=mypostgresadmin
+    DB_PASSWORD=myposgressecret
+    DB_NAME=weather
+
+    # PG Admin config
+    PG_ADMIN_MAIL=mypgadmin@gmail.com
+    PG_ADMIN_PASSWORD=mypgadminsecret
+
 
     docker-compose up -d
 

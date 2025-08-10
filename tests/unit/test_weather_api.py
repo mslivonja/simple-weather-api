@@ -1,3 +1,5 @@
+import io
+
 import pytest
 from unittest.mock import patch
 from tests.unit.test_weather_service import API_KEY
@@ -39,10 +41,11 @@ def test_get_weather_json(mock_fetch, client):
     assert json_data == fake_weather_data
     assert json_data["location"] == "Donji grad"
 
+@patch('app.S3Service.upload_file')
 @patch('app.WeatherService.fetch_weather')
-def test_get_weather_csv(mock_fetch, client):
+def test_get_weather_csv(mock_fetch, mock_s3, client):
     mock_fetch.return_value = fake_weather_data
+    mock_s3.return_value = "http://localhost:9000/tmp"
     response = client.get('/weather/api/city/Zagreb', headers={"Accept": "text/csv"})
     assert response.status_code == 200
-    lines = response.data.decode('utf-8').split('\r\n')
-    assert lines[1].split(',')[0] == 'Zagreb'
+    assert response.data.decode("utf-8") == "http://localhost:9000/tmp"

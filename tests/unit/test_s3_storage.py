@@ -1,15 +1,16 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
+from botocore.config import Config
 
 from s3_storage import S3Service
 
-BUCKET_NAME = "test-bucket"
+BUCKET_NAME = "test"
 
 def s3_service():
     return S3Service(
+        endpoint="http://localhost:9000",
         bucket_name= BUCKET_NAME,
-        region_name= None,
         access_key= "fake_id",
         secret_key= "fake_secret"
     )
@@ -29,20 +30,28 @@ def test_upload_file_success(mock_boto_client):
     # upload_fileobj should just run without exception
     mock_client_instance.upload_fileobj.return_value = None
 
+    file_name = "weather.csv"
+
+    # mock presigned url
+    signature = 'F3Cuu0Yj%2FB8bzS5Vu0zqhnecuqI%3D&Expires=1754856460'
+    url = f"http://localhost:9000/{BUCKET_NAME}/{file_name}?AWSAccessKeyId=myminioadmin&Signature={signature}"
+    mock_client_instance.generate_presigned_url.return_value = url
+
     # Run method
     file_content = fake_csv_data()
-    file_name = "weather.csv"
+
     service = s3_service()
     result_url = service.upload_file(file_content, file_name)
 
     # Assertions
-    assert result_url == f"http://localhost:9000/{BUCKET_NAME}/{file_name}"
     mock_boto_client.assert_called_once_with(
         "s3",
-        region_name=None,
+        endpoint_url="http://localhost:9000",
+        region_name = 'us-east-1',
         aws_access_key_id="fake_id",
         aws_secret_access_key="fake_secret"
     )
+    assert result_url == url
     mock_client_instance.upload_fileobj.assert_called_once()
 
 

@@ -30,8 +30,11 @@ Access Swagger UI at http://localhost:5000/api/docs
 
 GET request using following request
 
-    curl -X 'GET' 'http://localhost:5000/weather/Zagreb' \
+    curl -X 'GET' 'http://localhost:5000/weather/api/city/Zagreb' \
          -H 'accept: application/json'
+
+    curl -X 'GET' 'http://localhost:5000/weather/api/city/Zagreb' \
+         -H 'accept: text/csv'
 
 ### Deactivate virtual env
 

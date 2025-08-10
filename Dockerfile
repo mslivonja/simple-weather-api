@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app.py weather.py templates/ static/ /app/
+COPY app.py weather.py s3_storage.py templates/ static/ /app/
 
 # Expose internal container port 5000
 EXPOSE 5000

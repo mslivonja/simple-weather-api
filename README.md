@@ -74,8 +74,13 @@ GET request using following request
     curl -X 'GET' 'http://localhost:5000/weather/api/city/Zagreb' \
          -H 'accept: application/json'
 
+Response is JSON formatted data.
+
     curl -X 'GET' 'http://localhost:5000/weather/api/city/Zagreb' \
          -H 'accept: text/csv'
+
+Response is temp. S3 storage URL - file temp download link.
+
 
 ### Deactivate virtual env
 

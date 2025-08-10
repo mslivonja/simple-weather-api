@@ -53,7 +53,12 @@ Run docker container with app. only
 
 Run with docker compose
 
-    export OPENWEATHER_API_KEY=<api key>
+Prerequisite - create .env file with following variables
+    cat .env
+    OPENWEATHER_API_KEY=<api key>
+    MINIO_ACCESS_KEY=<user>
+    MINIO_SECRET_KEY=<secret>
+
     docker-compose up -d
 
     docker logs -f simple-weather-api

@@ -15,7 +15,7 @@ class WeatherService:
 
         self.units = units
 
-    def fetch_weather(self, city: str, country_code: str):
+    def fetch_weather(self, city: str, country_code: str | None):
         """Fetch live weather data from OpenWeatherMap API."""
         url = (
             f"{ OPENWEATHER_URL }"

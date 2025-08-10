@@ -14,6 +14,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 api = Api(app,  version='1.0',
           title='Simple Weather API',
           description='Simple Weather API',
+          doc='/api/docs'
 )
 
 # Setup namespace

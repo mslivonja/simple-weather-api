@@ -65,6 +65,14 @@ Prerequisite - create .env file with following variables
 
     docker-compose down
 
+## Minio S3 Storage
+
+S3 interface: http://localhost:9000
+Browser UI: http://localhost:9001
+
+Note: App. assumes bucket already exists. Connect to Minio browser UI at h
+http://localhost:9001 and create bucket='test' manually.
+
 ## REST API - Swagger UI
 
 Access Swagger UI at http://localhost:5000/api/docs

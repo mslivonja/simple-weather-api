@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
 
+from sqlalchemy import func
+
 db = SQLAlchemy()
 
 # Data model
@@ -55,3 +57,8 @@ class WeatherDBService:
 
     def get_request_by_id(self, request_id):
         return WeatherRequest.query.get(request_id)
+
+    def get_request_by_date(self, request_date):
+        return WeatherRequest.query.filter(
+                func.date(WeatherRequest.timestamp) == func.date(request_date)
+            ).all()

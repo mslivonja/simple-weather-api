@@ -1,7 +1,11 @@
 name: CI Pipeline
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - dev
 
 jobs:
   lint-test-build:
@@ -36,3 +40,15 @@ jobs:
         continue-on-error: true
         run: |
           pytest tests/unit --cov=. --cov-report=xml --cov-report=term
+
+      - name: Determine Docker tag
+        if: github.event_name == 'pull_request'
+        id: set_tag
+        run: |
+          echo "tag=PR-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+
+      # Step 6: Build Docker image (only if tests pass)
+      - name: Build and push docker image
+        if: github.event_name == 'pull_request'
+        run: |
+          docker build -t mslivonja/simple-weather-api:${{ steps.set_tag.outputs.tag }} .

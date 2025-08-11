@@ -2,17 +2,21 @@
 FROM python:3.13-slim
 LABEL authors="Matija Slivonja"
 
+RUN apt update \
+    && apt-get -y install libpq-dev gcc
+
 # Set working directory inside container
 WORKDIR /app
 
 # Copy requirement list first (for better caching)
 COPY requirements.txt .
 
+RUN pip install --upgrade pip
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app.py weather.py s3_storage.py templates/ static/ /app/
+COPY app.py weather.py s3_storage.py db_storage.py templates/ static/ /app/
 
 # Expose internal container port 5000
 EXPOSE 5000

@@ -2,6 +2,9 @@
 FROM python:3.13-slim
 LABEL authors="Matija Slivonja"
 
+RUN apt update \
+    && apt-get -y install libpq-dev gcc
+
 # Set working directory inside container
 WORKDIR /app
 

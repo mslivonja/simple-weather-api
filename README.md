@@ -23,6 +23,10 @@ to download CSV file with data.
 Each web request is persisted together with weather data in Postgres DB and can later be retrieved using web request
 retrieval endpoint.
 
+## System arhitecture
+
+![screenshot](docs/images/Simple weather API.drawio.png)
+
 ## Run app.
 
 ### Python virtual env.

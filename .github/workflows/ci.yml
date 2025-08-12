@@ -71,3 +71,15 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gettext-base
           envsubst < .env.template > .env
           cat .env
+
+      # Step 7: Copy files to remote server on port 2222
+      - name: Copy files via SCP
+        if: github.event_name == 'pull_request'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: ".env,docker-compose.yml"
+          target: "/tmp/docker-sandbox/stage"

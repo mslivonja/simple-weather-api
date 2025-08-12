@@ -60,3 +60,13 @@ jobs:
         run: |
           docker build -t mslivonja/simple-weather-api:${{ steps.set_tag.outputs.tag }} .
           docker push mslivonja/simple-weather-api:${{ steps.set_tag.outputs.tag }}
+          
+      - name: Generate .env file from template
+        if: github.event_name == 'pull_request'
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          VERSION: ${{ steps.set_tag.outputs.tag }}
+        run: | 
+          sudo apt-get update && sudo apt-get install -y gettext-base
+          envsubst < .env.template > .env
+          cat .env

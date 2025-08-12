@@ -83,3 +83,16 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: ".env,docker-compose.yml"
           target: "/tmp/docker-sandbox/stage"
+
+      # Step 7: Run complete App. stack
+      - name: Run command on remote server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /tmp/docker-sandbox/stage
+            docker compose pull
+            docker compose up -d

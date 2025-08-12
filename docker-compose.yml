@@ -1,9 +1,9 @@
-version: "3.9"
+version: "3.3"
 
 services:
 
   simple-weather-api:
-    image: simple-weather-api:latest
+    image: mslivonja/simple-weather-api:${VERSION}
     container_name: simple-weather-api
     ports:
       - "5000:5000"
@@ -57,7 +57,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_MAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
     ports:
-      - "8080:80"
+      - "8181:80"
     depends_on:
       - postgres
     volumes:

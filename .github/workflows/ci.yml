@@ -6,6 +6,14 @@ on:
     branches:
       - main
       - dev
+  push:
+    branches:
+      - main
+      - dev
+
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
   lint-test-build:
@@ -60,3 +68,48 @@ jobs:
         run: |
           docker build -t mslivonja/simple-weather-api:${{ steps.set_tag.outputs.tag }} .
           docker push mslivonja/simple-weather-api:${{ steps.set_tag.outputs.tag }}
+          
+      - name: Generate .env file from template
+        if: github.event_name == 'pull_request'
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          VERSION: ${{ steps.set_tag.outputs.tag }}
+        run: | 
+          sudo apt-get update && sudo apt-get install -y gettext-base
+          envsubst < .env.template > .env
+          cat .env
+
+      # Step 7: Copy files to remote server on port 2222
+      - name: Copy files via SCP
+        if: github.event_name == 'pull_request'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: ".env,docker-compose.yml"
+          target: "/tmp/docker-sandbox/stage"
+
+      # Step 7: Run complete App. stack
+      - name: Run command on remote server
+        if: github.event_name == 'pull_request'
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /tmp/docker-sandbox/stage
+            docker-compose pull
+            docker-compose up -d
+
+      - name: Comment PR - staging env. ready
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            🚀 **Staging Updated**
+            PR: #${{ github.event.pull_request.number }}
+            Happy testing !!!

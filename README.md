@@ -25,7 +25,7 @@ retrieval endpoint.
 
 ## System arhitecture
 
-![screenshot](docs/images/Simple weather API.drawio.png)
+![System architecture](docs/images/Simple_weather_API.drawio.png)
 
 ## Run app.
 

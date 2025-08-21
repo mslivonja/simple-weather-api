@@ -90,8 +90,12 @@ def test_fetch_weather_url(fake_get_ok) -> None:
     # do not care what is returned
     service.fetch_weather('TestCity', 'NL')
 
-    expected_url = OPENWEATHER_URL + f"?q={city},{country_code}&appid={API_KEY}&units=metric"
-    mock_get.assert_called_once_with(expected_url)
+    params = {
+        "q": f"{city},{country_code}",
+        "appid": API_KEY,
+        "units": "metric",
+    }
+    mock_get.assert_called_once_with(OPENWEATHER_URL, params=params)
 
 
 def test_fetch_weather_success(fake_get_ok) -> None:

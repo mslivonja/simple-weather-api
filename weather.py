@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import requests
+from requests import HTTPError
 
 # noinspection HttpUrlsUsage
 OPENWEATHER_URL = 'http://api.openweathermap.org/data/2.5/weather'
@@ -18,37 +19,56 @@ class WeatherService:
 
     def fetch_weather(self, city: str, country_code: str | None):
         """Fetch live weather data from OpenWeatherMap API."""
-        url = (
-            f"{ OPENWEATHER_URL }"
-            f"?q={city},{country_code}&appid={self.api_key}&units={self.units}"
-        )
-        response = requests.get(url)
-        if response.status_code != 200:
-            raise WeatherServiceException(response.status_code,
-                                          city,
-                                          country_code)
 
-        data = response.json()
-        return {
-            "city": city,
-            "location": data["name"],
-            "temp": data["main"]["temp"],
-            "feels_like": data["main"]["feels_like"],
-            "temp_min": data["main"]["temp_min"],
-            "temp_max": data["main"]["temp_max"],
-            "pressure": data["main"]["pressure"],
-            "humidity": data["main"]["humidity"],
-            "visibility": data["visibility"],
-            "wind_speed": data["wind"]["speed"],
-            "description": data["weather"][0]["description"].capitalize(),
-            "timestamp": datetime.fromtimestamp(data["dt"])
-        }
+        try:
+            url = (
+                f"{ OPENWEATHER_URL }"
+                f"?q={city},{country_code}&appid={self.api_key}&units={self.units}"
+            )
+            response = requests.get(url)
+
+            # raise HTTPError
+            response.raise_for_status()
+
+            # convert response to JSON
+            data = response.json()
+
+            # extract all relevant information from response
+            return {
+                "city": city,
+                "location": data["name"],
+                "temp": data["main"]["temp"],
+                "feels_like": data["main"]["feels_like"],
+                "temp_min": data["main"]["temp_min"],
+                "temp_max": data["main"]["temp_max"],
+                "pressure": data["main"]["pressure"],
+                "humidity": data["main"]["humidity"],
+                "visibility": data["visibility"],
+                "wind_speed": data["wind"]["speed"],
+                "description": data["weather"][0]["description"].capitalize(),
+                "timestamp": datetime.fromtimestamp(data["dt"])
+            }
+        except Exception as e:
+            raise WeatherServiceException(e, city, country_code)
 
 class WeatherServiceException(Exception):
-    def __init__(self, status_code:int, city:str, country_code:str):
-        self.status_code = status_code
+
+    def __init__(self, e: Exception, city:str, country_code=None):
+        self.exception = e
         self.city = city
         self.country_code = country_code
 
     def __str__(self):
-        return f"Request for City: '{self.city}', Country: '{self.country_code}' failed with status code {self.status_code}"
+        if  isinstance(self.exception, HTTPError):
+            http_error : HTTPError = self.exception
+            if http_error.response.status_code == 404:
+                return f"City '{self.city}':'{self.country_code}' not found"
+            else:
+                return (f"HTTP request for city: '{self.city}' "
+                        f"and  country '{self.country_code}' "
+                        f"failed with status code '{http_error.status_code}'")
+        # in all other cases
+        return (f"Unknow error occurred while fetching weather from OpenWeatherMap "
+                    f"for city '{self.city}' "
+                    f"and country code '{self.country_code}'")
+

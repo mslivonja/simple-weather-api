@@ -21,11 +21,12 @@ class WeatherService:
         """Fetch live weather data from OpenWeatherMap API."""
 
         try:
-            url = (
-                f"{ OPENWEATHER_URL }"
-                f"?q={city},{country_code}&appid={self.api_key}&units={self.units}"
-            )
-            response = requests.get(url)
+            params = {
+                "q": f"{city},{country_code}",
+                "appid": self.api_key,
+                "units": self.units
+            }
+            response = requests.get(OPENWEATHER_URL, params=params)
 
             # raise HTTPError
             response.raise_for_status()
